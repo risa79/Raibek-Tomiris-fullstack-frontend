@@ -1,1 +1,450 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Мой профиль — SkillSwap</title><link rel="stylesheet" href="css/style.css"></head><body><header class="topbar"><a class="brand" href="index.html"><span class="brand-icon">↔</span> SkillSwap</a><nav id="nav" class="nav" aria-label="Основная навигация"><a href="index.html">Главная</a><a href="offers.html">Найти обмен</a><a href="profile.html" aria-current="page">Мой профиль</a></nav><button class="menu-toggle" id="menuToggle" aria-expanded="false" aria-controls="nav">☰ <span class="sr-only">Открыть меню</span></button></header><main class="page"><div class="page-title"><div><span class="eyebrow">Личный кабинет</span><h1>Мои навыки</h1><p>Предлагай свои знания и сохраняй интересные обмены.</p></div></div><div class="profile-layout"><section class="panel"><h2>Новое предложение</h2><form id="offerForm" novalidate><label for="author">Твоё имя</label><input id="author" name="author" required minlength="2" maxlength="40" placeholder="Например, Айдана"><label for="teach">Чему можешь научить</label><input id="teach" name="teach" required minlength="2" maxlength="60" placeholder="Английский"><label for="learn">Чему хочешь научиться</label><input id="learn" name="learn" required minlength="2" maxlength="60" placeholder="Python"><label for="offerCategory">Категория твоего навыка</label><select id="offerCategory" name="category"><option>Языки</option><option>Программирование</option><option>Дизайн</option><option>Учёба</option></select><label for="description">Краткое описание</label><textarea id="description" name="description" rows="3" required minlength="10" maxlength="220" placeholder="Какой у тебя опыт и как удобно заниматься?"></textarea><p class="error" id="formError" role="alert"></p><button class="btn primary full" type="submit">Опубликовать предложение</button></form></section><div class="profile-side"><section class="panel"><h2>Мои предложения <span id="myCount" class="badge">0</span></h2><div id="myOffers" class="stack"></div></section><section class="panel"><h2>Мои запросы <span id="requestCount" class="badge">0</span></h2><div id="myRequests" class="stack"></div></section></div></div></main><footer class="footer"><span>↔ SkillSwap · Учись. Делись. Расти.</span><span>Учебный MVP · 2026</span></footer><script src="js/app.js" defer></script></body></html>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Мой профиль — SkillSwap</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="container nav">
+
+            <a href="index.html" class="logo">
+                <span class="logo-icon">✦</span>
+                SkillSwap<span class="logo-dot">.</span>
+            </a>
+
+            <nav class="nav-links" id="navLinks">
+                <a href="index.html">Главная</a>
+                <a href="offers.html">Найти навыки</a>
+                <a href="index.html#how-it-works">Как это работает</a>
+            </nav>
+
+            <div class="nav-actions">
+                <a href="offers.html" class="btn btn-outline">
+                    Найти навыки
+                </a>
+
+                <a href="profile.html" class="btn btn-primary">
+                    Мой профиль
+                </a>
+            </div>
+
+            <button
+                class="menu-toggle"
+                id="menuToggle"
+                type="button"
+                aria-label="Открыть меню"
+                aria-expanded="false">
+                ☰
+            </button>
+
+        </div>
+    </header>
+
+
+    <main>
+
+        <!-- PROFILE HEADER -->
+        <section class="profile-hero">
+
+            <div class="container">
+
+                <span class="section-label">
+                    ЛИЧНЫЙ КАБИНЕТ
+                </span>
+
+                <h1>Мой профиль</h1>
+
+                <p>
+                    Расскажи о себе, поделись знаниями
+                    и найди новых партнёров для обучения.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- PROFILE CONTENT -->
+        <section class="profile-section">
+
+            <div class="container profile-layout">
+
+                <!-- LEFT COLUMN -->
+                <aside class="profile-sidebar">
+
+                    <div class="profile-user-card">
+
+                        <div class="profile-avatar" id="profileAvatar">
+                            С
+                        </div>
+
+                        <h2 id="profileDisplayName">
+                            Студент SkillSwap
+                        </h2>
+
+                        <p class="profile-role">
+                            Участник сообщества
+                        </p>
+
+                        <div class="profile-divider"></div>
+
+                        <div class="profile-stat">
+
+                            <span>Мои предложения</span>
+
+                            <strong id="profileOffersCount">
+                                0
+                            </strong>
+
+                        </div>
+
+                        <div class="profile-stat">
+
+                            <span>Статус</span>
+
+                            <strong class="profile-status">
+                                ● Активен
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="profile-tip">
+
+                        <div class="profile-tip-icon">
+                            💡
+                        </div>
+
+                        <h3>Совет</h3>
+
+                        <p>
+                            Чем подробнее ты опишешь свои навыки,
+                            тем проще другим студентам будет
+                            предложить тебе обмен.
+                        </p>
+
+                    </div>
+
+                </aside>
+
+
+                <!-- RIGHT COLUMN -->
+                <div class="profile-main">
+
+                    <!-- PERSONAL INFO -->
+                    <div class="profile-panel">
+
+                        <div class="panel-heading">
+
+                            <div>
+                                <span class="section-label">
+                                    ОБО МНЕ
+                                </span>
+
+                                <h2>Личная информация</h2>
+
+                                <p>
+                                    Эти данные помогут другим
+                                    участникам узнать тебя лучше.
+                                </p>
+                            </div>
+
+                            <div class="panel-icon">
+                                👤
+                            </div>
+
+                        </div>
+
+
+                        <form id="profileForm">
+
+                            <div class="form-group">
+
+                                <label for="profileName">
+                                    Имя
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="profileName"
+                                    placeholder="Как тебя зовут?"
+                                    maxlength="60"
+                                    required>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="profileUniversity">
+                                    Университет
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="profileUniversity"
+                                    placeholder="Например, Satbayev University"
+                                    maxlength="100">
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="profileBio">
+                                    Немного о себе
+                                </label>
+
+                                <textarea
+                                    id="profileBio"
+                                    placeholder="Расскажи о своих интересах и навыках..."
+                                    maxlength="500"></textarea>
+
+                            </div>
+
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary">
+                                Сохранить профиль
+                            </button>
+
+                        </form>
+
+                    </div>
+
+
+                    <!-- CREATE OFFER -->
+                    <div class="profile-panel" id="create-offer">
+
+                        <div class="panel-heading">
+
+                            <div>
+                                <span class="section-label">
+                                    ПОДЕЛИСЬ ЗНАНИЯМИ
+                                </span>
+
+                                <h2>Создать предложение</h2>
+
+                                <p>
+                                    Укажи, чему ты можешь научить
+                                    и какой навык хочешь получить взамен.
+                                </p>
+                            </div>
+
+                            <div class="panel-icon">
+                                ✨
+                            </div>
+
+                        </div>
+
+
+                        <form id="offerForm">
+
+                            <div class="form-group">
+
+                                <label for="offerTitle">
+                                    Чему ты можешь научить?
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="offerTitle"
+                                    placeholder="Например, Python с нуля"
+                                    maxlength="100"
+                                    required>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="offerCategory">
+                                    Категория
+                                </label>
+
+                                <select id="offerCategory" required>
+
+                                    <option value="">
+                                        Выбери категорию
+                                    </option>
+
+                                    <option value="programming">
+                                        Программирование
+                                    </option>
+
+                                    <option value="languages">
+                                        Иностранные языки
+                                    </option>
+
+                                    <option value="design">
+                                        Дизайн
+                                    </option>
+
+                                    <option value="science">
+                                        Наука и аналитика
+                                    </option>
+
+                                    <option value="other">
+                                        Другое
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="offerWanted">
+                                    Что хочешь изучить взамен?
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="offerWanted"
+                                    placeholder="Например, английский язык"
+                                    maxlength="100"
+                                    required>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="offerDescription">
+                                    Описание предложения
+                                </label>
+
+                                <textarea
+                                    id="offerDescription"
+                                    placeholder="Расскажи, чему именно можешь научить, какой у тебя опыт и как планируешь проводить занятия..."
+                                    maxlength="1000"
+                                    required></textarea>
+
+                            </div>
+
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary btn-large">
+                                + Опубликовать предложение
+                            </button>
+
+                        </form>
+
+                    </div>
+
+
+                    <!-- MY OFFERS -->
+                    <div class="profile-panel">
+
+                        <div class="panel-heading">
+
+                            <div>
+                                <span class="section-label">
+                                    МОЯ АКТИВНОСТЬ
+                                </span>
+
+                                <h2>Мои предложения</h2>
+
+                                <p>
+                                    Здесь отображаются навыки,
+                                    которыми ты поделился.
+                                </p>
+                            </div>
+
+                            <div class="panel-icon">
+                                📚
+                            </div>
+
+                        </div>
+
+
+                        <div class="my-offers-list" id="myOffersList">
+
+                            <!--
+                                Предложения будут добавляться
+                                через JavaScript.
+                            -->
+
+                        </div>
+
+
+                        <div class="my-offers-empty" id="myOffersEmpty">
+
+                            <div>📭</div>
+
+                            <h3>Пока нет предложений</h3>
+
+                            <p>
+                                Создай своё первое предложение,
+                                чтобы другие студенты могли
+                                найти тебя в каталоге.
+                            </p>
+
+                            <a href="#create-offer" class="btn btn-outline">
+                                Создать предложение
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- FOOTER -->
+    <footer class="footer">
+
+        <div class="container footer-content">
+
+            <div class="footer-brand">
+
+                <a href="index.html" class="logo">
+                    <span class="logo-icon">✦</span>
+                    SkillSwap<span class="logo-dot">.</span>
+                </a>
+
+                <p>
+                    Платформа обмена навыками между студентами.
+                    Учись, обучая других.
+                </p>
+
+            </div>
+
+            <div class="footer-links">
+                <a href="index.html">Главная</a>
+                <a href="offers.html">Найти навыки</a>
+                <a href="profile.html">Профиль</a>
+            </div>
+
+        </div>
+
+        <div class="container footer-bottom">
+            <p>© 2026 SkillSwap. Учебный Fullstack-проект.</p>
+        </div>
+
+    </footer>
+
+
+    <script src="js/app.js"></script>
+
+</body>
+</html>

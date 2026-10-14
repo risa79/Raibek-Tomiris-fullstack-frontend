@@ -1,21 +1,736 @@
-'use strict';
-const STORAGE_OFFERS='skillswap_offers_v1';
-const STORAGE_REQUESTS='skillswap_requests_v1';
-const samples=[
-{id:'demo1',author:'Айдана',teach:'Английский',learn:'Python',category:'Языки',description:'Помогу с разговорным английским, хочу разобраться с основами Python.'},
-{id:'demo2',author:'Тимур',teach:'Python',learn:'Figma',category:'Программирование',description:'Объясню основы программирования на примерах и обменяюсь на уроки дизайна.'},
-{id:'demo3',author:'Диана',teach:'Figma',learn:'Математика',category:'Дизайн',description:'Научу создавать макеты приложений. Нужна помощь с математическим анализом.'},
-{id:'demo4',author:'Арман',teach:'Математика',learn:'Английский',category:'Учёба',description:'Разберём задачи по алгебре и математике в обмен на практику английского.'},
-{id:'demo5',author:'София',teach:'Немецкий',learn:'Python',category:'Языки',description:'Могу помочь с немецким уровня A1–B1, хочу научиться писать скрипты.'},
-{id:'demo6',author:'Ерасыл',teach:'HTML и CSS',learn:'Английский',category:'Программирование',description:'Помогу сверстать первую страницу, ищу партнёра для разговорной практики.'}
+"use strict";
+
+/* ==========================================
+   SKILLSWAP — JAVASCRIPT
+========================================== */
+
+const STORAGE_KEYS = {
+    profile: "skillswap_profile",
+    offers: "skillswap_offers",
+    requests: "skillswap_requests"
+};
+
+const CATEGORIES = {
+    programming: "💻 Программирование",
+    languages: "🌍 Иностранные языки",
+    design: "🎨 Дизайн",
+    science: "📊 Наука и аналитика",
+    other: "✨ Другое"
+};
+
+/* ==========================================
+   ДЕМОНСТРАЦИОННЫЕ ПРЕДЛОЖЕНИЯ
+========================================== */
+
+const demoOffers = [
+    {
+        id: "demo-1",
+        author: "Александр",
+        university: "Satbayev University",
+        title: "Python с нуля",
+        category: "programming",
+        wanted: "Английский язык",
+        description: "Помогу разобраться с Python, переменными, циклами и функциями. Ищу партнёра для разговорной практики английского.",
+        createdAt: "2026-10-01T10:00:00",
+        demo: true
+    },
+    {
+        id: "demo-2",
+        author: "Мария",
+        university: "КазНУ",
+        title: "Разговорный английский",
+        category: "languages",
+        wanted: "Основы веб-разработки",
+        description: "Помогу улучшить разговорный английский и подготовиться к собеседованиям. Хочу научиться создавать сайты.",
+        createdAt: "2026-10-02T12:00:00",
+        demo: true
+    },
+    {
+        id: "demo-3",
+        author: "Данияр",
+        university: "SDU University",
+        title: "UI/UX дизайн в Figma",
+        category: "design",
+        wanted: "JavaScript",
+        description: "Научу создавать интерфейсы мобильных приложений и сайтов. Взамен хочу изучить JavaScript.",
+        createdAt: "2026-10-03T09:00:00",
+        demo: true
+    },
+    {
+        id: "demo-4",
+        author: "Алина",
+        university: "Satbayev University",
+        title: "Математика и статистика",
+        category: "science",
+        wanted: "Английский язык",
+        description: "Объясню основы статистики, вероятности и анализа данных простым языком.",
+        createdAt: "2026-10-04T15:00:00",
+        demo: true
+    },
+    {
+        id: "demo-5",
+        author: "Руслан",
+        university: "AITU",
+        title: "HTML и CSS",
+        category: "programming",
+        wanted: "Графический дизайн",
+        description: "Помогу сверстать первый адаптивный сайт. Хочу научиться работать с графикой.",
+        createdAt: "2026-10-05T11:00:00",
+        demo: true
+    },
+    {
+        id: "demo-6",
+        author: "Айгерим",
+        university: "КазНУ",
+        title: "Японский язык для начинающих",
+        category: "languages",
+        wanted: "Python",
+        description: "Помогу выучить хирагану, катакану и базовые японские выражения.",
+        createdAt: "2026-10-06T14:00:00",
+        demo: true
+    }
 ];
-const read=(key)=>{try{const v=JSON.parse(localStorage.getItem(key));return Array.isArray(v)?v:[]}catch{return[]}};
-const offers=()=>[...read(STORAGE_OFFERS),...samples];
-const el=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n};
-function card(offer,compact=false){const article=el('article','card');const top=el('div','card-top');top.append(el('span','avatar',offer.author.charAt(0).toUpperCase()),el('span','tag',offer.category));article.append(top,el('h3','',offer.author));const row=el('div','exchange');row.append(el('span','',offer.teach),el('span','arrow','⇄'),el('span','',offer.learn));article.append(row,el('p','',offer.description));if(!compact){const btn=el('button','btn primary','Предложить обмен');btn.type='button';btn.addEventListener('click',()=>openRequest(offer));article.append(btn)}return article}
-const menu=document.getElementById('menuToggle');if(menu){menu.addEventListener('click',()=>{const nav=document.getElementById('nav');const open=nav.classList.toggle('open');menu.setAttribute('aria-expanded',String(open))})}
-const featured=document.getElementById('featuredCards');if(featured){offers().slice(0,3).forEach(o=>featured.append(card(o,true)));document.getElementById('offerCount').textContent=offers().length}
-const grid=document.getElementById('offersGrid');if(grid){const search=document.getElementById('search'),category=document.getElementById('category');function render(){grid.replaceChildren();const q=search.value.trim().toLocaleLowerCase('ru');const data=offers().filter(o=>(category.value==='all'||o.category===category.value)&&[o.author,o.teach,o.learn,o.description].some(v=>v.toLocaleLowerCase('ru').includes(q)));data.forEach(o=>grid.append(card(o)));document.getElementById('resultCount').textContent=`Найдено предложений: ${data.length}`;document.getElementById('emptyState').classList.toggle('hidden',data.length!==0)}search.addEventListener('input',render);category.addEventListener('change',render);document.getElementById('resetFilters').addEventListener('click',()=>{search.value='';category.value='all';render()});render()}
-let selected=null;const dialog=document.getElementById('requestDialog');function openRequest(offer){if(!dialog)return;selected=offer;document.getElementById('dialogTitle').textContent=`Обмен с ${offer.author}`;document.getElementById('dialogDescription').textContent=`${offer.teach} ⇄ ${offer.learn}`;document.getElementById('requestMessage').value='';document.getElementById('dialogError').textContent='';dialog.showModal()}
-if(dialog){document.getElementById('cancelRequest').addEventListener('click',()=>dialog.close());document.getElementById('sendRequest').addEventListener('click',()=>{const message=document.getElementById('requestMessage').value.trim();if(message.length<10){document.getElementById('dialogError').textContent='Напиши сообщение не короче 10 символов.';return}const requests=read(STORAGE_REQUESTS);requests.unshift({id:crypto.randomUUID(),to:selected.author,teach:selected.teach,learn:selected.learn,message});localStorage.setItem(STORAGE_REQUESTS,JSON.stringify(requests));dialog.close();alert('Запрос сохранён! Посмотри его в профиле. Отправка другому студенту появится после подключения сервера.')})}
-const form=document.getElementById('offerForm');if(form){function renderProfile(){const mine=document.getElementById('myOffers'),requestsBox=document.getElementById('myRequests');mine.replaceChildren();requestsBox.replaceChildren();const own=read(STORAGE_OFFERS),reqs=read(STORAGE_REQUESTS);document.getElementById('myCount').textContent=own.length;document.getElementById('requestCount').textContent=reqs.length;if(!own.length)mine.append(el('p','hint','Пока нет предложений. Добавь первое!'));own.forEach(o=>{const item=el('div','mini');item.append(el('strong','',`${o.teach} ⇄ ${o.learn}`),el('p','',o.description));const btn=el('button','','Удалить');btn.type='button';btn.addEventListener('click',()=>{localStorage.setItem(STORAGE_OFFERS,JSON.stringify(read(STORAGE_OFFERS).filter(x=>x.id!==o.id)));renderProfile()});item.append(btn);mine.append(item)});if(!reqs.length)requestsBox.append(el('p','hint','Запросов пока нет. Найди обмен в каталоге.'));reqs.forEach(r=>{const item=el('div','mini');item.append(el('strong','',`Для ${r.to}: ${r.teach} ⇄ ${r.learn}`),el('p','',r.message));requestsBox.append(item)})}form.addEventListener('submit',e=>{e.preventDefault();const data=new FormData(form),values=Object.fromEntries(data.entries());const error=document.getElementById('formError');if(values.author.trim().length<2||values.teach.trim().length<2||values.learn.trim().length<2||values.description.trim().length<10){error.textContent='Заполни все поля. Имя и навыки — от 2 символов, описание — от 10.';return}error.textContent='';const record={id:crypto.randomUUID(),...Object.fromEntries(Object.entries(values).map(([k,v])=>[k,v.trim()]))};localStorage.setItem(STORAGE_OFFERS,JSON.stringify([record,...read(STORAGE_OFFERS)]));form.reset();renderProfile()});renderProfile()}
+
+/* ==========================================
+   РАБОТА С LOCALSTORAGE
+========================================== */
+
+function loadData(key, fallback) {
+    try {
+        const raw = localStorage.getItem(key);
+
+        if (!raw) {
+            return fallback;
+        }
+
+        return JSON.parse(raw);
+    } catch (error) {
+        console.error("Ошибка чтения localStorage:", error);
+        return fallback;
+    }
+}
+
+function saveData(key, data) {
+    try {
+        localStorage.setItem(key, JSON.stringify(data));
+        return true;
+    } catch (error) {
+        console.error("Ошибка сохранения:", error);
+        alert("Не удалось сохранить данные в браузере.");
+        return false;
+    }
+}
+
+function getProfile() {
+    return loadData(STORAGE_KEYS.profile, {
+        name: "",
+        university: "",
+        bio: ""
+    });
+}
+
+function getMyOffers() {
+    const offers = loadData(STORAGE_KEYS.offers, []);
+
+    return Array.isArray(offers) ? offers : [];
+}
+
+function getAllOffers() {
+    return [...getMyOffers(), ...demoOffers];
+}
+
+/* ==========================================
+   ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+========================================== */
+
+function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, (char) => {
+        const entities = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        };
+
+        return entities[char];
+    });
+}
+
+function getInitial(name) {
+    return (String(name || "С").trim().charAt(0) || "С").toUpperCase();
+}
+
+function generateId() {
+    if (window.crypto && crypto.randomUUID) {
+        return crypto.randomUUID();
+    }
+
+    return `offer-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+function showMessage(message) {
+    alert(message);
+}
+
+/* ==========================================
+   МОБИЛЬНОЕ МЕНЮ
+========================================== */
+
+function initMobileMenu() {
+    const toggle = document.getElementById("menuToggle");
+    const links = document.getElementById("navLinks");
+
+    if (!toggle || !links) {
+        return;
+    }
+
+    toggle.addEventListener("click", () => {
+        const isOpen = links.classList.toggle("open");
+
+        toggle.setAttribute("aria-expanded", String(isOpen));
+        toggle.setAttribute(
+            "aria-label",
+            isOpen ? "Закрыть меню" : "Открыть меню"
+        );
+
+        toggle.textContent = isOpen ? "✕" : "☰";
+    });
+
+    links.querySelectorAll("a").forEach((link) => {
+        link.addEventListener("click", () => {
+            links.classList.remove("open");
+            toggle.setAttribute("aria-expanded", "false");
+            toggle.textContent = "☰";
+        });
+    });
+}
+
+/* ==========================================
+   СТРАНИЦА ПРОФИЛЯ
+========================================== */
+
+function initProfilePage() {
+    const profileForm = document.getElementById("profileForm");
+    const offerForm = document.getElementById("offerForm");
+
+    if (!profileForm || !offerForm) {
+        return;
+    }
+
+    const profile = getProfile();
+
+    document.getElementById("profileName").value = profile.name || "";
+    document.getElementById("profileUniversity").value =
+        profile.university || "";
+    document.getElementById("profileBio").value = profile.bio || "";
+
+    updateProfileDisplay();
+    renderMyOffers();
+
+    /* Сохранение профиля */
+
+    profileForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const updatedProfile = {
+            name: document.getElementById("profileName").value.trim(),
+            university: document.getElementById("profileUniversity").value.trim(),
+            bio: document.getElementById("profileBio").value.trim()
+        };
+
+        if (!updatedProfile.name) {
+            showMessage("Пожалуйста, укажи своё имя.");
+            return;
+        }
+
+        if (saveData(STORAGE_KEYS.profile, updatedProfile)) {
+            updateProfileDisplay();
+            showMessage("Профиль успешно сохранён!");
+        }
+    });
+
+    /* Создание предложения */
+
+    offerForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const currentProfile = getProfile();
+
+        if (!currentProfile.name.trim()) {
+            showMessage("Сначала сохрани своё имя в профиле.");
+            document.getElementById("profileName").focus();
+            return;
+        }
+
+        const title = document.getElementById("offerTitle").value.trim();
+        const category = document.getElementById("offerCategory").value;
+        const wanted = document.getElementById("offerWanted").value.trim();
+        const description = document.getElementById("offerDescription").value.trim();
+
+        if (!title || !category || !wanted || !description) {
+            showMessage("Заполни все поля предложения.");
+            return;
+        }
+
+        const newOffer = {
+            id: generateId(),
+            author: currentProfile.name,
+            university: currentProfile.university || "Студент SkillSwap",
+            title,
+            category,
+            wanted,
+            description,
+            createdAt: new Date().toISOString(),
+            demo: false
+        };
+
+        const offers = getMyOffers();
+
+        offers.unshift(newOffer);
+
+        if (saveData(STORAGE_KEYS.offers, offers)) {
+            offerForm.reset();
+            renderMyOffers();
+
+            showMessage(
+                "Предложение опубликовано! Теперь оно доступно в каталоге."
+            );
+        }
+    });
+}
+
+function updateProfileDisplay() {
+    const profile = getProfile();
+
+    const displayName = document.getElementById("profileDisplayName");
+    const avatar = document.getElementById("profileAvatar");
+
+    if (displayName) {
+        displayName.textContent = profile.name || "Студент SkillSwap";
+    }
+
+    if (avatar) {
+        avatar.textContent = getInitial(profile.name);
+    }
+}
+
+function renderMyOffers() {
+    const list = document.getElementById("myOffersList");
+    const empty = document.getElementById("myOffersEmpty");
+    const count = document.getElementById("profileOffersCount");
+
+    if (!list || !empty) {
+        return;
+    }
+
+    const offers = getMyOffers();
+
+    if (count) {
+        count.textContent = offers.length;
+    }
+
+    list.innerHTML = "";
+
+    empty.hidden = offers.length > 0;
+
+    offers.forEach((offer) => {
+        const item = document.createElement("div");
+
+        item.className = "my-offer-item";
+
+        item.innerHTML = `
+            <div class="my-offer-info">
+                <h3>${escapeHTML(offer.title)}</h3>
+
+                <p>
+                    ${escapeHTML(CATEGORIES[offer.category] || "Другое")}
+                    · Хочу изучить:
+                    ${escapeHTML(offer.wanted)}
+                </p>
+            </div>
+
+            <div class="my-offer-actions">
+                <button
+                    type="button"
+                    class="btn-danger"
+                    data-delete-id="${escapeHTML(offer.id)}">
+                    Удалить
+                </button>
+            </div>
+        `;
+
+        list.appendChild(item);
+    });
+}
+
+function initDeleteOffers() {
+    const list = document.getElementById("myOffersList");
+
+    if (!list) {
+        return;
+    }
+
+    list.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-delete-id]");
+
+        if (!button) {
+            return;
+        }
+
+        const id = button.dataset.deleteId;
+
+        const confirmed = confirm(
+            "Ты действительно хочешь удалить это предложение?"
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        const updatedOffers = getMyOffers().filter(
+            (offer) => String(offer.id) !== id
+        );
+
+        if (saveData(STORAGE_KEYS.offers, updatedOffers)) {
+            renderMyOffers();
+        }
+    });
+}
+
+/* ==========================================
+   СТРАНИЦА КАТАЛОГА
+========================================== */
+
+let currentCategory = "all";
+
+function initOffersPage() {
+    const grid = document.getElementById("offersGrid");
+
+    if (!grid) {
+        return;
+    }
+
+    const searchInput = document.getElementById("searchInput");
+    const filters = document.getElementById("categoryFilters");
+    const sortSelect = document.getElementById("sortSelect");
+    const resetButton = document.getElementById("resetFilters");
+
+    renderOffers();
+
+    /* Поиск */
+
+    searchInput?.addEventListener("input", renderOffers);
+
+    /* Фильтрация */
+
+    filters?.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-category]");
+
+        if (!button) {
+            return;
+        }
+
+        currentCategory = button.dataset.category;
+
+        filters.querySelectorAll(".filter-btn").forEach((filter) => {
+            filter.classList.toggle(
+                "active",
+                filter === button
+            );
+        });
+
+        renderOffers();
+    });
+
+    /* Сортировка */
+
+    sortSelect?.addEventListener("change", renderOffers);
+
+    /* Сброс */
+
+    resetButton?.addEventListener("click", () => {
+        searchInput.value = "";
+        sortSelect.value = "newest";
+        currentCategory = "all";
+
+        filters.querySelectorAll(".filter-btn").forEach((button) => {
+            button.classList.toggle(
+                "active",
+                button.dataset.category === "all"
+            );
+        });
+
+        renderOffers();
+    });
+
+    /* Открытие модального окна */
+
+    grid.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-exchange-id]");
+
+        if (!button) {
+            return;
+        }
+
+        openExchangeModal(button.dataset.exchangeId);
+    });
+
+    initExchangeModal();
+}
+
+function renderOffers() {
+    const grid = document.getElementById("offersGrid");
+
+    if (!grid) {
+        return;
+    }
+
+    const search = (
+        document.getElementById("searchInput")?.value || ""
+    ).trim().toLowerCase();
+
+    const sort = document.getElementById("sortSelect")?.value || "newest";
+
+    let offers = getAllOffers();
+
+    /* Поиск по нескольким полям */
+
+    offers = offers.filter((offer) => {
+        const searchableText = [
+            offer.author,
+            offer.university,
+            offer.title,
+            offer.wanted,
+            offer.description,
+            CATEGORIES[offer.category]
+        ].join(" ").toLowerCase();
+
+        const matchesSearch = searchableText.includes(search);
+
+        const matchesCategory =
+            currentCategory === "all" ||
+            offer.category === currentCategory;
+
+        return matchesSearch && matchesCategory;
+    });
+
+    /* Сортировка */
+
+    if (sort === "az") {
+        offers.sort((a, b) =>
+            a.title.localeCompare(b.title, "ru")
+        );
+    } else {
+        offers.sort((a, b) =>
+            new Date(b.createdAt) - new Date(a.createdAt)
+        );
+    }
+
+    /* Количество результатов */
+
+    const resultsCount = document.getElementById("resultsCount");
+
+    if (resultsCount) {
+        resultsCount.textContent =
+            `Найдено предложений: ${offers.length}`;
+    }
+
+    /* Пустой результат */
+
+    const emptyState = document.getElementById("emptyState");
+
+    if (emptyState) {
+        emptyState.hidden = offers.length > 0;
+    }
+
+    /* Создание карточек */
+
+    grid.innerHTML = offers.map(createOfferCard).join("");
+}
+
+function createOfferCard(offer) {
+    const category = CATEGORIES[offer.category] || "✨ Другое";
+
+    return `
+        <article class="offer-card">
+
+            <div class="offer-card-header">
+
+                <div class="offer-avatar">
+                    ${escapeHTML(getInitial(offer.author))}
+                </div>
+
+                <div class="offer-author">
+                    <h3>${escapeHTML(offer.author)}</h3>
+                    <p>${escapeHTML(offer.university)}</p>
+                </div>
+
+            </div>
+
+            <span class="offer-category">
+                ${escapeHTML(category)}
+            </span>
+
+            <span class="offer-skill-label">
+                МОГУ НАУЧИТЬ
+            </span>
+
+            <h3 class="offer-skill-title">
+                ${escapeHTML(offer.title)}
+            </h3>
+
+            <div class="offer-exchange">
+
+                <span class="offer-exchange-icon">⇄</span>
+
+                <div>
+                    <p>Хочу изучить взамен</p>
+                    <strong>${escapeHTML(offer.wanted)}</strong>
+                </div>
+
+            </div>
+
+            <p class="offer-description">
+                ${escapeHTML(offer.description)}
+            </p>
+
+            <button
+                type="button"
+                class="btn btn-primary"
+                data-exchange-id="${escapeHTML(offer.id)}">
+                Предложить обмен →
+            </button>
+
+        </article>
+    `;
+}
+
+/* ==========================================
+   МОДАЛЬНОЕ ОКНО ОБМЕНА
+========================================== */
+
+function openExchangeModal(offerId) {
+    const modal = document.getElementById("exchangeModal");
+    const selectedOffer = getAllOffers().find(
+        (offer) => String(offer.id) === offerId
+    );
+
+    if (!modal || !selectedOffer) {
+        return;
+    }
+
+    document.getElementById("selectedOfferId").value = offerId;
+
+    document.getElementById("modalDescription").textContent =
+        `Ты предлагаешь обмен студенту ${selectedOffer.author}. ` +
+        `Он предлагает «${selectedOffer.title}» ` +
+        `и хочет изучить «${selectedOffer.wanted}».`;
+
+    const profile = getProfile();
+
+    document.getElementById("exchangeName").value = profile.name || "";
+
+    modal.hidden = false;
+    document.body.style.overflow = "hidden";
+
+    document.getElementById("exchangeName").focus();
+}
+
+function closeExchangeModal() {
+    const modal = document.getElementById("exchangeModal");
+
+    if (!modal) {
+        return;
+    }
+
+    modal.hidden = true;
+    document.body.style.overflow = "";
+
+    document.getElementById("exchangeForm")?.reset();
+}
+
+function initExchangeModal() {
+    const modal = document.getElementById("exchangeModal");
+    const form = document.getElementById("exchangeForm");
+
+    if (!modal || !form) {
+        return;
+    }
+
+    document.getElementById("closeModal")?.addEventListener(
+        "click",
+        closeExchangeModal
+    );
+
+    document.getElementById("cancelExchange")?.addEventListener(
+        "click",
+        closeExchangeModal
+    );
+
+    modal.addEventListener("click", (event) => {
+        if (event.target === modal) {
+            closeExchangeModal();
+        }
+    });
+
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && !modal.hidden) {
+            closeExchangeModal();
+        }
+    });
+
+    /* Отправка заявки */
+
+    form.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const offerId = document.getElementById("selectedOfferId").value;
+
+        const request = {
+            id: generateId(),
+            offerId,
+            name: document.getElementById("exchangeName").value.trim(),
+            skill: document.getElementById("exchangeSkill").value.trim(),
+            message: document.getElementById("exchangeMessage").value.trim(),
+            createdAt: new Date().toISOString()
+        };
+
+        if (!request.name || !request.skill || !request.message) {
+            showMessage("Пожалуйста, заполни все поля.");
+            return;
+        }
+
+        const requests = loadData(STORAGE_KEYS.requests, []);
+
+        const updatedRequests = Array.isArray(requests)
+            ? requests
+            : [];
+
+        updatedRequests.push(request);
+
+        if (saveData(STORAGE_KEYS.requests, updatedRequests)) {
+            closeExchangeModal();
+
+            showMessage(
+                "Заявка сохранена!\n\n" +
+                "Это демонстрационная версия SkillSwap. " +
+                "Заявка хранится только в твоём браузере " +
+                "и пока не отправляется другому студенту."
+            );
+        }
+    });
+}
+
+/* ==========================================
+   ЗАПУСК ПРИ ЗАГРУЗКЕ СТРАНИЦЫ
+========================================== */
+
+document.addEventListener("DOMContentLoaded", () => {
+    initMobileMenu();
+
+    initProfilePage();
+    initDeleteOffers();
+
+    initOffersPage();
+});

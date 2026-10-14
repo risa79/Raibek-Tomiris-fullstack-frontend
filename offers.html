@@ -1,1 +1,408 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Найти обмен — SkillSwap</title><link rel="stylesheet" href="css/style.css"></head><body><header class="topbar"><a class="brand" href="index.html"><span class="brand-icon">↔</span> SkillSwap</a><nav id="nav" class="nav" aria-label="Основная навигация"><a href="index.html">Главная</a><a href="offers.html" aria-current="page">Найти обмен</a><a href="profile.html">Мой профиль</a></nav><button class="menu-toggle" id="menuToggle" aria-expanded="false" aria-controls="nav">☰ <span class="sr-only">Открыть меню</span></button></header><main class="page"><div class="page-title"><div><span class="eyebrow">Каталог навыков</span><h1>Найди свой обмен</h1><p>Изучай предложения и находи студентов с нужными навыками.</p></div><a class="btn primary" href="profile.html">+ Создать предложение</a></div><div class="filters"><label for="search">Поиск по навыку или имени</label><input id="search" type="search" placeholder="Например, Python"><label for="category">Категория</label><select id="category"><option value="all">Все категории</option><option value="Языки">Языки</option><option value="Программирование">Программирование</option><option value="Дизайн">Дизайн</option><option value="Учёба">Учёба</option></select><button class="btn secondary" id="resetFilters" type="button">Сбросить</button></div><p class="results" id="resultCount" aria-live="polite"></p><div class="card-grid" id="offersGrid"></div><p class="empty hidden" id="emptyState">Ничего не найдено. Попробуй другой запрос.</p></main><dialog id="requestDialog" class="dialog"><form method="dialog"><button class="close" value="cancel" aria-label="Закрыть">×</button><span class="eyebrow">Запрос на обмен</span><h2 id="dialogTitle">Предложить обмен</h2><p id="dialogDescription"></p><label for="requestMessage">Сообщение студенту</label><textarea id="requestMessage" rows="4" maxlength="300" placeholder="Привет! Я могу помочь с..." required></textarea><p class="hint">Минимум 10 символов. В учебной версии запрос сохраняется на этом устройстве.</p><div class="actions"><button type="button" class="btn secondary" id="cancelRequest">Отмена</button><button type="button" class="btn primary" id="sendRequest">Сохранить запрос</button></div><p id="dialogError" class="error" role="alert"></p></form></dialog><footer class="footer"><span>↔ SkillSwap · Учись. Делись. Расти.</span><span>Учебный MVP · 2026</span></footer><script src="js/app.js" defer></script></body></html>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Найти навыки — SkillSwap</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="container nav">
+
+            <a href="index.html" class="logo">
+                <span class="logo-icon">✦</span>
+                SkillSwap<span class="logo-dot">.</span>
+            </a>
+
+            <nav class="nav-links" id="navLinks">
+                <a href="index.html">Главная</a>
+                <a href="offers.html" class="active">Найти навыки</a>
+                <a href="index.html#how-it-works">Как это работает</a>
+            </nav>
+
+            <div class="nav-actions">
+                <a href="profile.html" class="btn btn-outline">
+                    Мой профиль
+                </a>
+
+                <a href="profile.html" class="btn btn-primary">
+                    + Создать предложение
+                </a>
+            </div>
+
+            <button
+                class="menu-toggle"
+                id="menuToggle"
+                type="button"
+                aria-label="Открыть меню"
+                aria-expanded="false">
+                ☰
+            </button>
+
+        </div>
+    </header>
+
+
+    <main>
+
+        <!-- ЗАГОЛОВОК -->
+        <section class="catalog-hero">
+
+            <div class="container">
+
+                <div class="catalog-heading">
+
+                    <div>
+                        <span class="section-label">
+                            СООБЩЕСТВО SKILLSWAP
+                        </span>
+
+                        <h1>Найди свой идеальный обмен</h1>
+
+                        <p>
+                            Исследуй предложения студентов.
+                            Найди человека, который научит тебя
+                            новому навыку в обмен на твои знания.
+                        </p>
+                    </div>
+
+                    <div class="catalog-illustration" aria-hidden="true">
+                        <span>🎓</span>
+                        <span>⇄</span>
+                        <span>💻</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- КАТАЛОГ -->
+        <section class="catalog-section">
+
+            <div class="container">
+
+                <!-- ПОИСК -->
+                <div class="catalog-toolbar">
+
+                    <div class="search-box">
+
+                        <span class="search-icon" aria-hidden="true">
+                            🔍
+                        </span>
+
+                        <input
+                            type="search"
+                            id="searchInput"
+                            placeholder="Поиск: Python, английский, дизайн..."
+                            aria-label="Поиск предложений">
+
+                    </div>
+
+                    <a href="profile.html" class="btn btn-primary">
+                        + Предложить навык
+                    </a>
+
+                </div>
+
+
+                <!-- ФИЛЬТРЫ -->
+                <div class="catalog-filters" id="categoryFilters">
+
+                    <button
+                        type="button"
+                        class="filter-btn active"
+                        data-category="all">
+                        Все навыки
+                    </button>
+
+                    <button
+                        type="button"
+                        class="filter-btn"
+                        data-category="programming">
+                        💻 Программирование
+                    </button>
+
+                    <button
+                        type="button"
+                        class="filter-btn"
+                        data-category="languages">
+                        🌍 Языки
+                    </button>
+
+                    <button
+                        type="button"
+                        class="filter-btn"
+                        data-category="design">
+                        🎨 Дизайн
+                    </button>
+
+                    <button
+                        type="button"
+                        class="filter-btn"
+                        data-category="science">
+                        📊 Наука
+                    </button>
+
+                    <button
+                        type="button"
+                        class="filter-btn"
+                        data-category="other">
+                        ✨ Другое
+                    </button>
+
+                </div>
+
+
+                <!-- КОЛИЧЕСТВО ПРЕДЛОЖЕНИЙ -->
+                <div class="catalog-results">
+
+                    <div>
+                        <h2>Предложения студентов</h2>
+
+                        <p id="resultsCount">
+                            Загружаем предложения...
+                        </p>
+                    </div>
+
+                    <div class="catalog-sort">
+                        <label for="sortSelect">Сортировка:</label>
+
+                        <select id="sortSelect">
+                            <option value="newest">Сначала новые</option>
+                            <option value="az">По названию А–Я</option>
+                        </select>
+                    </div>
+
+                </div>
+
+
+                <!-- КАРТОЧКИ -->
+                <div class="offers-grid" id="offersGrid">
+
+                    <!--
+                        Карточки создаются через JavaScript.
+                        Это позволяет искать, фильтровать
+                        и добавлять предложения без перезагрузки.
+                    -->
+
+                </div>
+
+
+                <!-- ПУСТОЙ РЕЗУЛЬТАТ -->
+                <div class="empty-state" id="emptyState" hidden>
+
+                    <div class="empty-icon">🔎</div>
+
+                    <h3>Ничего не найдено</h3>
+
+                    <p>
+                        Попробуй изменить поисковый запрос
+                        или выбрать другую категорию.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="btn btn-primary"
+                        id="resetFilters">
+                        Сбросить фильтры
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ДОПОЛНИТЕЛЬНЫЙ БЛОК -->
+        <section class="catalog-cta">
+
+            <div class="container">
+
+                <div class="catalog-cta-box">
+
+                    <div>
+                        <span class="section-label">
+                            НЕ НАШЁЛ ПОДХОДЯЩИЙ ОБМЕН?
+                        </span>
+
+                        <h2>Предложи свой навык первым!</h2>
+
+                        <p>
+                            Расскажи, чему ты можешь научить.
+                            Возможно, кто-то уже ищет именно тебя.
+                        </p>
+                    </div>
+
+                    <a href="profile.html" class="btn btn-primary btn-large">
+                        Создать предложение →
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- МОДАЛЬНОЕ ОКНО -->
+    <div class="modal-overlay" id="exchangeModal" hidden>
+
+        <div
+            class="modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modalTitle">
+
+            <div class="modal-header">
+
+                <div>
+                    <span class="section-label">
+                        НОВЫЙ ОБМЕН
+                    </span>
+
+                    <h2 id="modalTitle">
+                        Предложить обмен
+                    </h2>
+                </div>
+
+                <button
+                    type="button"
+                    class="modal-close"
+                    id="closeModal"
+                    aria-label="Закрыть окно">
+                    ×
+                </button>
+
+            </div>
+
+
+            <p class="modal-description" id="modalDescription">
+                Расскажи, какой навык ты можешь предложить взамен.
+            </p>
+
+
+            <form id="exchangeForm">
+
+                <input type="hidden" id="selectedOfferId">
+
+                <div class="form-group">
+
+                    <label for="exchangeName">
+                        Твоё имя
+                    </label>
+
+                    <input
+                        type="text"
+                        id="exchangeName"
+                        placeholder="Например, Томирис"
+                        maxlength="60"
+                        required>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="exchangeSkill">
+                        Чему ты можешь научить?
+                    </label>
+
+                    <input
+                        type="text"
+                        id="exchangeSkill"
+                        placeholder="Например, английский язык"
+                        maxlength="100"
+                        required>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="exchangeMessage">
+                        Сообщение
+                    </label>
+
+                    <textarea
+                        id="exchangeMessage"
+                        placeholder="Расскажи немного о себе и предложи формат обмена..."
+                        maxlength="500"
+                        required></textarea>
+
+                </div>
+
+
+                <div class="modal-actions">
+
+                    <button
+                        type="button"
+                        class="btn btn-outline"
+                        id="cancelExchange">
+                        Отмена
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary">
+                        Отправить заявку →
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- FOOTER -->
+    <footer class="footer">
+
+        <div class="container footer-content">
+
+            <div class="footer-brand">
+
+                <a href="index.html" class="logo">
+                    <span class="logo-icon">✦</span>
+                    SkillSwap<span class="logo-dot">.</span>
+                </a>
+
+                <p>
+                    Платформа обмена навыками между студентами.
+                    Учись, обучая других.
+                </p>
+
+            </div>
+
+            <div class="footer-links">
+                <a href="index.html">Главная</a>
+                <a href="offers.html">Найти навыки</a>
+                <a href="profile.html">Профиль</a>
+            </div>
+
+        </div>
+
+        <div class="container footer-bottom">
+            <p>© 2026 SkillSwap. Учебный Fullstack-проект.</p>
+        </div>
+
+    </footer>
+
+
+    <script src="js/app.js"></script>
+
+</body>
+</html>
